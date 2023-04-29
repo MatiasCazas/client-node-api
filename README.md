@@ -1,30 +1,6 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API en Nest con conexion a mongodb con autenticación basica de usuario y contraseña
 
 ## Installation
 
@@ -58,16 +34,60 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## AUTENTICACION
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+POST /auth/login
 
-## Stay in touch
+{
+  "user": "test",
+  "password": "test"
+}
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Esto devuelve un Access Token: 
 
-## License
+```bash
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJzdWIiOiIxIiwiaWF0IjoxNjgyNzg3NTAxLCJleHAiOjE2ODI3ODc1NjF9.kFudp1xd5q206_6suO5h0rBb2bQDSFboIVqWIaozWt8"
+}
+```
+Este access token debe pasarse como metodo de autenticación en las request.
+Por ejemplo:
 
-Nest is [MIT licensed](LICENSE).
+```bash
+curl --location 'localhost:3000/users/' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJzdWIiOiIxIiwiaWF0IjoxNjgyNzg3NTAxLCJleHAiOjE2ODI3ODc1NjF9.kFudp1xd5q206_6suO5h0rBb2bQDSFboIVqWIaozWt8'
+```
+
+## USUARIOS
+
+Para crear un usuario deberá hacerse una POST request con un body de tipo multipart/form-data
+
+```bash
+curl --location 'localhost:3000/users/' \
+--form 'profilePicture=@"/path/to/file"' \
+--form 'name="mati"' \
+--form 'lastName="cazas"' \
+--form 'address="calle falsa 123"' \
+--form 'password="123456password"'
+```
+
+Para obtener un usuario:
+
+```bash 
+curl --location 'localhost:3000/users/' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJzdWIiOiIxIiwiaWF0IjoxNjgyNzg4NTYxLCJleHAiOjE2ODI3ODg2MjF9.WX-qhj1LNxPfRyzInZ-PUhG9QY3odPFvZ_OjjojjYIo'
+```
+
+Para editar un usuario:
+
+```bash
+curl --location --request PUT 'localhost:3000/users/644b0019254495752d4e25e7' \
+--form 'profilePicture=@"/path/to/file"' \
+--form 'name="aaaaaaaa"' \
+--form 'lastName="cazas"' \
+--form 'address="calle falsa 123"' \
+--form 'password="123456password"'
+```
+
